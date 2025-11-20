@@ -1,0 +1,1 @@
+void animation_clic_bouton(int x, int y, int w, int h, const char* texte);
