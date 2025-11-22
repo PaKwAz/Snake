@@ -1,6 +1,8 @@
-#include "types.h"
-#define taille_max 19
-
+#include "fct_types.h"
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <MLV/MLV_all.h>
 
 void spawn_pomme(cases plateau[taille_max][taille_max]){
     int xpomme,ypomme;
@@ -158,15 +160,13 @@ void evenement(int *direction){
 
 
 
-int main_jeu(int hauteur, int largeur){
+void main_jeu(int hauteur, int largeur){
     int direction,xtete,ytete,longueur;
     cases plateau[taille_max][taille_max];
     srand(time(NULL));
     longueur = 1;
     xtete = 9, ytete = 9;
     direction=1;
-    hauteur = 1500;
-    largeur = 1500;
     init_plat(plateau,&xtete,&ytete);
     affichage(plateau,hauteur,largeur);
     do {
@@ -179,6 +179,5 @@ int main_jeu(int hauteur, int largeur){
 
     
 
-    MLV_free_window();
-    exit(EXIT_SUCCESS);
+    
 }

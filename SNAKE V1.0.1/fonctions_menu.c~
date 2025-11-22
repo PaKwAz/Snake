@@ -1,0 +1,265 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <MLV/MLV_all.h>
+#include "fct_menu.h"
+#include "fct_types.h"
+
+void animation_clic_bouton(int x, int y, int w, int h, const char* texte) {
+    int tw, th;
+    MLV_get_size_of_text(texte, &tw, &th);
+
+    MLV_draw_filled_rectangle(x, y, w, h, MLV_rgba(100, 100, 100, 255));
+    MLV_draw_text(x + w/2 - tw/2, y + h/2 - th/2, texte, MLV_COLOR_WHITE);
+
+    MLV_actualise_window();
+    MLV_wait_milliseconds(75);
+
+    MLV_draw_filled_rectangle(x, y, w, h, MLV_rgba(50, 50, 50, 255));
+    MLV_draw_text(x + w/2 - tw/2, y + h/2 - th/2, texte, MLV_COLOR_WHITE);
+    MLV_actualise_window();
+}
+
+void dessiner_bouton(int x, int y, int w, int h, const char* texte) {
+    int tw, th;
+
+    MLV_get_size_of_text(texte, &tw, &th);
+
+    MLV_draw_filled_rectangle(x, y, w, h, MLV_rgba(50, 50, 50, 255));
+
+    MLV_draw_text(x + w/2 - tw/2, y + h/2 - th/2, texte, MLV_COLOR_WHITE);
+}
+
+int clic_bouton(int bx, int by, int bw, int bh, int mx, int my) {
+    return (mx >= bx && mx <= bx + bw &&
+            my >= by && my <= by + bh);
+}
+
+void afficher_menu(int width, int height, MLV_Font* font_title) {
+  int tw, th, b_largeur, b_hauteur, b_milieu_x, b_ecart_entre, by1, by2, by3;
+
+    MLV_clear_window(MLV_COLOR_BLACK);
+    MLV_draw_filled_rectangle(0, 0, width, height,
+                              MLV_rgba(30, 30, 30, 255));
+
+    MLV_get_size_of_text_with_font("SNAKE GAME", &tw, &th, font_title);
+
+    MLV_draw_text_with_font(
+        width/2 - tw/2,
+        70,
+        "SNAKE GAME",
+        font_title,
+        MLV_COLOR_GREEN
+    );
+
+    b_largeur = width / 2;
+    b_hauteur = height / 4;
+    b_milieu_x = (width - b_largeur) / 2;
+    b_ecart_entre = (height - (b_hauteur * 3)) / 4;
+    by1 = b_ecart_entre;
+    by2 = by1 + b_hauteur + b_ecart_entre;
+    by3 = by2 + b_hauteur + b_ecart_entre;
+
+    dessiner_bouton(b_milieu_x, by1, b_largeur, b_hauteur, "Charger Partie");
+    dessiner_bouton(b_milieu_x, by2, b_largeur, b_hauteur, "Nouvelle Partie");
+    dessiner_bouton(b_milieu_x, by3, b_largeur, b_hauteur, "2 Joueurs");
+    dessiner_bouton_quitter(width,height);
+
+    MLV_actualise_window();
+}
+
+void dessiner_bouton_retour(int width, int height) {
+    dessiner_bouton(width - 160, height - 80, 140, 50, "Retour");
+}
+
+void dessiner_bouton_quitter(int width, int height) {
+    dessiner_bouton(width - 160, height - 80, 140, 50, "Quitter");
+}
+
+void dessiner_boutons_impexp(int width, int height) {
+  int s_largeur = width / 4, s_hauteur = height / 2;
+  int s_milieu_y = (height - s_hauteur) / 2;
+  int s_ecart_entre = (height - (s_largeur * 3)) / 4;
+  int sx1 = s_ecart_entre;
+  int sx2 = sx1 + s_largeur + s_ecart_entre;
+  int sx3 = sx2 + s_largeur + s_ecart_entre;
+  
+  dessiner_bouton( sx1, s_milieu_y, s_largeur, s_hauteur, "Sauvegarde 1");
+  dessiner_bouton( sx2, s_milieu_y, s_largeur, s_hauteur, "Sauvegarde 2");
+  dessiner_bouton( sx3, s_milieu_y, s_largeur, s_hauteur, "Sauvegarde 3");
+}
+
+void afficher_charger(int width, int height, MLV_Font* font_title) {
+  int tw, th, i=1;
+
+  MLV_clear_window(MLV_rgba(30, 30, 30, 255));
+  
+  MLV_get_size_of_text_with_font("Charger Partie", &tw, &th, font_title);
+  MLV_draw_text_with_font(width/2 - tw/2,70,"Charger Partie",font_title,MLV_COLOR_GREEN);
+
+  dessiner_bouton_retour(width, height);
+  dessiner_boutons_impexp(width, height);
+  
+  MLV_actualise_window();
+}
+
+void afficher_nouvelle(int width, int height, MLV_Font* font_title) {
+  int tw, th;
+
+  MLV_clear_window(MLV_rgba(30, 30, 30, 255));
+    
+  MLV_get_size_of_text_with_font("Nouvelle Partie", &tw, &th, font_title);
+  MLV_draw_text_with_font(width/2 - tw/2,70,"Nouvelle Partie",font_title,MLV_COLOR_GREEN);
+  dessiner_bouton_retour(width, height);
+  dessiner_boutons_impexp(width, height);
+    
+  MLV_actualise_window();
+}
+
+void afficher_2joueurs(int width, int height, MLV_Font* font_title) {
+  int tw, th;
+    
+  MLV_clear_window(MLV_rgba(30, 30, 30, 255));
+    
+  MLV_get_size_of_text_with_font("Jouer à 2 joueurs", &tw, &th, font_title);
+  MLV_draw_text_with_font(width/2 - tw/2,70,"Jouer à 2 joueurs",font_title,MLV_COLOR_GREEN);
+    
+  dessiner_bouton_retour(width, height);
+
+  MLV_actualise_window();
+}
+
+void boucle_menu(int width, int height, MLV_Font* font_title){
+  int i = 1;
+  int mx, my;
+  int b_largeur = width / 2;
+  int b_hauteur = height / 4;
+  int b_milieu_x = (width - b_largeur) / 2;
+  int b_ecart_entre = (height - (b_hauteur * 3)) / 4;
+  int by1 = b_ecart_entre;
+  int by2 = by1 + b_hauteur + b_ecart_entre;
+  int by3 = by2 + b_hauteur + b_ecart_entre;
+  int quitterx = width - 160; 
+  int quittery = height - 80; 
+  int quitterw = 140;         
+  int quitterh = 50;
+  
+  while (i==1) {
+
+    afficher_menu(width, height, font_title);
+    
+    MLV_wait_mouse(&mx, &my);
+
+    if (clic_bouton(b_milieu_x, by1, b_largeur, b_hauteur, mx, my)){
+      animation_clic_bouton(b_milieu_x, by1, b_largeur, b_hauteur, "Charger Partie");
+      boucle_charger(width,height,font_title);
+    }
+    if (clic_bouton(b_milieu_x, by2, b_largeur, b_hauteur, mx, my)){
+      animation_clic_bouton(b_milieu_x, by2, b_largeur, b_hauteur, "Nouvelle Partie");
+      boucle_charger(width,height,font_title);
+    }
+    if (clic_bouton(b_milieu_x, by3, b_largeur, b_hauteur, mx, my)){
+      animation_clic_bouton(b_milieu_x, by3, b_largeur, b_hauteur, "2 Joueurs");
+      boucle_charger(width,height,font_title);
+    }
+    if (clic_bouton(quitterx, quittery, quitterw, quitterh, mx, my)) {
+      animation_clic_bouton(quitterx, quittery, quitterw, quitterh, "Quitter");
+      i=0;
+    }
+  }
+}
+
+void boucle_charger(int width, int height, MLV_Font* font_title){
+  int i = 1;
+  int mx,my;
+  int retourx = width - 160; 
+  int retoury = height - 80; 
+  int retourw = 140;
+  int retourh = 50;
+  int s_largeur = width / 4, s_hauteur = height / 2;
+  int s_milieu_y = (height - s_hauteur) / 2;
+  int s_ecart_entre = (height - (s_largeur * 3)) / 4;
+  int sx1 = s_ecart_entre;
+  int sx2 = sx1 + s_largeur + s_ecart_entre;
+  int sx3 = sx2 + s_largeur + s_ecart_entre;
+ 
+    
+  while (i==1){
+
+    afficher_charger(width,height, font_title);
+    
+    MLV_wait_mouse(&mx,&my);
+
+    if (clic_bouton(retourx, retoury, retourw, retourh, mx, my)) {
+      animation_clic_bouton(retourx, retoury, retourw, retourh, "Retour");
+      i=0;
+    }
+    if (clic_bouton(sx1, s_milieu_y, s_largeur, s_hauteur, mx, my)) {
+      animation_clic_bouton(sx1, s_milieu_y, s_largeur, s_hauteur, "Sauvegarde 1");
+    }
+    if (clic_bouton(sx2, s_milieu_y, s_largeur, s_hauteur, mx, my)) {
+      animation_clic_bouton(sx2, s_milieu_y, s_largeur, s_hauteur, "Sauvegarde 2");
+    }
+    if (clic_bouton(sx3, s_milieu_y, s_largeur, s_hauteur, mx, my)) {
+      animation_clic_bouton(sx3, s_milieu_y, s_largeur, s_hauteur, "Sauvegarde 3");
+    }
+  }
+}
+
+void boucle_nouvelle(int width, int height, MLV_Font* font_title){
+  int i = 1;
+  int mx,my;
+  int retourx = width - 160; 
+  int retoury = height - 80; 
+  int retourw = 140;         
+  int retourh = 50;
+  int s_largeur = width / 4, s_hauteur = height / 2;
+  int s_milieu_y = (height - s_hauteur) / 2;
+  int s_ecart_entre = (height - (s_largeur * 3)) / 4;
+  int sx1 = s_ecart_entre;
+  int sx2 = sx1 + s_largeur + s_ecart_entre;
+  int sx3 = sx2 + s_largeur + s_ecart_entre;
+    
+  while (i==1){
+
+    afficher_nouvelle(width,height, font_title);
+    
+    MLV_wait_mouse(&mx,&my);
+
+    if (clic_bouton(retourx, retoury, retourw, retourh, mx, my)) {
+      animation_clic_bouton(retourx, retoury, retourw, retourh, "Retour");
+      i=0;
+    }
+    if (clic_bouton(sx1, s_milieu_y, s_largeur, s_hauteur, mx, my)) {
+      animation_clic_bouton(sx1, s_milieu_y, s_largeur, s_hauteur, "Sauvegarde 1");
+    }
+    if (clic_bouton(sx2, s_milieu_y, s_largeur, s_hauteur, mx, my)) {
+      animation_clic_bouton(sx2, s_milieu_y, s_largeur, s_hauteur, "Sauvegarde 2");
+    }
+    if (clic_bouton(sx3, s_milieu_y, s_largeur, s_hauteur, mx, my)) {
+      animation_clic_bouton(sx3, s_milieu_y, s_largeur, s_hauteur, "Sauvegarde 3");
+    }
+  }
+}
+
+void boucle_2joueurs(int width, int height, MLV_Font* font_title){
+  int i = 1;
+  int mx,my;
+  int retourx = width - 160; 
+  int retoury = height - 80; 
+  int retourw = 140;         
+  int retourh = 50;
+
+    
+  while (i==1){
+
+    afficher_2joueurs(width,height, font_title);
+    
+    MLV_wait_mouse(&mx,&my);
+
+    if (clic_bouton(retourx, retoury, retourw, retourh, mx, my)) {
+      animation_clic_bouton(retourx, retoury, retourw, retourh, "Retour");
+      i=0;
+    }
+    
+  }
+}

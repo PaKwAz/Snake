@@ -6,7 +6,7 @@
 #define taille_max 19
 
 int main() {
-    int width = 800, height = 600;
+    int width = 1000, height = 1000;
     int mx, my;
     int rx = width - 160; 
     int ry = height - 80; 
@@ -29,9 +29,9 @@ int main() {
         bh = 70;
 
         if (clic_bouton(bx, 200, bw, bh, mx, my)){
-	  animation_clic_bouton(bx, 200, bw, bh, "Continuer Partie");
+	  animation_clic_bouton(bx, 200, bw, bh, "Charger Partie");
 	  effacer_page();
-	  afficher_continuer(width,height, font_title);
+	  afficher_charger(width,height, font_title);
 	}
         if (clic_bouton(bx, 300, bw, bh, mx, my)){
 	  animation_clic_bouton(bx, 300, bw, bh, "Nouvelle Partie");
