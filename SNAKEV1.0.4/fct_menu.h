@@ -11,7 +11,7 @@ int clic_bouton(int bx, int by, int bw, int bh, int mx, int my);
 
 void afficher_menu(int width, int height);
 
-void afficher_menu_cote();
+void afficher_menu_cote(int *score);
 
 void afficher_continuer(int width, int height);
 
