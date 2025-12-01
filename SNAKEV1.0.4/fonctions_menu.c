@@ -27,9 +27,14 @@ void afficher_menu(int width, int height) {
 }
 
 
-void afficher_menu_cote() {
-  MLV_Image* fond = MLV_load_image("assets/cote.jpg");
-  MLV_draw_image(fond, 1000, 0);
+void afficher_menu_cote(int *score) {
+
+    MLV_Font* font = MLV_load_font( "assets/ARCADE_N.TTF", 50 );
+    char score1[5];
+    MLV_Image* fond = MLV_load_image("assets/cote.jpg");
+    MLV_draw_image(fond, 1000, 0);
+    sprintf(score1, "%d", *score);
+    MLV_draw_text_with_font( 1150, 275, score1, font, MLV_COLOR_BLACK );
 }
 
 void afficher_continuer(int width, int height) {

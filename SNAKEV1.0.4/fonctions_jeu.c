@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <MLV/MLV_all.h>
 
+
+
 void affichage_jeu(int x, int y, int hauteur, MLV_Color couleur){
     int taille_case = hauteur / taille_max;
     MLV_draw_filled_rectangle(x * taille_case, y * taille_case, taille_case, taille_case, couleur);
@@ -56,7 +58,7 @@ void affichage_initial(cases plateau[taille_max][taille_max], int hauteur, int l
     MLV_wait_milliseconds(150);
 }
 
-int pas_perdu(cases plateau[taille_max][taille_max], int direction, int *xtete, int *ytete, int *longueur, int *decr, int hauteur){
+int pas_perdu(cases plateau[taille_max][taille_max], int direction, int *xtete, int *ytete, int *longueur, int *decr, int hauteur, int *score){
     int nouv_x = *xtete;
     int nouv_y = *ytete;
     int resultat = 1;
@@ -87,6 +89,8 @@ int pas_perdu(cases plateau[taille_max][taille_max], int direction, int *xtete, 
         *longueur = *longueur + 1;
         spawn_pomme(plateau, hauteur);
         *decr = 0;
+        *score += 1;
+        afficher_menu_cote(score);
     }
     else {
         resultat = 1;
@@ -134,28 +138,66 @@ void evenement(int *direction){
     }
 }
 
+int get_scores( int *meilleurscore1, int *meilleurscore2, int *meilleurscore3){
+    int ret1 = 0, ret2 = 0, ret3 = 0, score1, score2, score3;
+    FILE* records = fopen( "records.txt", "r" );
+    if ( records == NULL ) {
+        if ( records == NULL ) {
+            printf("erreur lors de la création du fichier");
+            exit(EXIT_FAILURE);
+        }
+        
+        
+    }
+    else {
+        if ( fscanf(records,"%d",&score1) != 1 ) ret1 = 1;
+        if ( fscanf(records,"%d",&score2) != 1 ) ret2 = 1;
+        if ( fscanf(records,"%d",&score3) != 1 ) ret3 = 1;
+    }
+    *meilleurscore1 = score1;
+    *meilleurscore2 = score2;
+    *meilleurscore3 = score3;
+    fclose(records);
+    return (ret1 || ret2 || ret3);
+}
+
+void ecrire_res( int meilleurscore1, int meilleurscore2, int meilleurscore3){
+    FILE* records = fopen( "records.txt", "w" );
+    fprintf(records,"%d\n", meilleurscore1);
+    fprintf(records,"%d\n", meilleurscore2);
+    fprintf(records,"%d\n", meilleurscore3);
+    fclose(records);
+}
+
 void main_jeu(int hauteur, int largeur){
-    int direction, xtete, ytete, longueur, xenlever, yenlever, decr;
+    int direction, xtete, ytete, longueur, xenlever, yenlever, decr, score, meilleurscore1, meilleurscore2, meilleurscore3;
     cases plateau[taille_max][taille_max];
     MLV_Color couleur_fond;
-    
+
+
+    score = 0;
     srand(time(NULL));
     decr = 1;
     longueur = 1;
-    
     init_plat(plateau, &xtete, &ytete, hauteur);
     xenlever = xtete;
     yenlever = ytete;
     direction = 1;
-    afficher_menu_cote();
     affichage_initial(plateau, hauteur, largeur);
+    afficher_menu_cote(&score);
+    if (get_scores(&meilleurscore1, &meilleurscore2, &meilleurscore3)){
+        printf("Erreur lors de la récupération des records, scores réinitialisés");
+            meilleurscore1 = 0;
+            meilleurscore2 = 0;
+            meilleurscore3 = 0;
+    }
     
     do {
         avancer_tete(plateau, xtete, ytete, longueur);
         
         affichage_jeu(xtete, ytete, hauteur, MLV_COLOR_WHITE);
 	
-	afficher_menu_cote();
+
         if(decr == 1) {
             decrementer(plateau, xtete, ytete, &xenlever, &yenlever);
             if ((xenlever + yenlever) % 2 == 0) 
@@ -172,5 +214,10 @@ void main_jeu(int hauteur, int largeur){
         evenement(&direction);
         decr = 1;
         
-    } while (pas_perdu(plateau, direction, &xtete, &ytete, &longueur, &decr, hauteur));
+    } while (pas_perdu(plateau, direction, &xtete, &ytete, &longueur, &decr, hauteur, &score));
+    if (score > meilleurscore1) meilleurscore1 = score;
+    else if ( score > meilleurscore2 ) meilleurscore2 = score;
+    else if (score > meilleurscore3 ) meilleurscore3 = score;
+    printf("%d, %d, %d",meilleurscore1, meilleurscore2, meilleurscore3);
+    ecrire_res(meilleurscore1, meilleurscore2, meilleurscore3);
 }
